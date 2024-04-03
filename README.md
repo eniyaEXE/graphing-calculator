@@ -8,4 +8,6 @@ ROADMAP (not in any particular order):
 - add calc features (dy/dx, minima/maxima, etc.)
 - add more operators (|x|, logarithms, factorials etc.)
 - add constants (pi, e, tau etc.)
+- add settings and customization
+- add possibility for multiple equations at the same time
 - and probably more!
