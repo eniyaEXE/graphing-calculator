@@ -5,13 +5,7 @@ import matplotlib.pyplot as plt
 import re
 import warnings
 
-equation1 = 0
-equation2 = 0
-equation3 = 0
-equation4 = 0
-equation5 = 0
-
-red = "\033[31m"
+red = "\033[31m"        # ANSI color codes, I just made them into variables so it's easy to work with
 green = "\033[32m"
 blue = "\033[34m"
 yellow = "\033[33m"
@@ -23,12 +17,12 @@ underline = "\033[4m"
 strikethrough = "\033[9m"
 clear = "\033[0m"
 
-def add_multiplication_operator(text):
+def add_multiplication_operator(text):          # this looks for a pattern of a number and then a letter (2x, 3a, 7s etc.) and puts " * " in between. this is so you can write an equation like you would normally, but the computer can still understand it
     pattern = r'(\d+)([a-zA-Z]+)'
     result = re.sub(pattern, r'\1 * \2', text)
     return result
 
-def replace_parts_of_equations(equationNumber):
+def replace_parts_of_equations(equationNumber): # replaces parts of an equation that it takes from the dictionary (where the equations are stored) with a number you give it. again, this is so the computer can understand it and you can write it normally
     equation = equations[f"Y{equationNumber}"]
     for old, new in replacements.items():
         equation = equation.replace(old, new)
@@ -36,7 +30,7 @@ def replace_parts_of_equations(equationNumber):
     return equation
 
 def plot_equations():
-    y1, y2, y3, y4, y5 = None, None, None, None, None
+    y1, y2, y3, y4, y5 = None, None, None, None, None   # sets all of them to None, so ones that can't get evaluated won't be plotted and won't raise an exception
     try:
         y1 = eval(replace_parts_of_equations(1))  # evaluates the equations (with the replaced parts) for every value in the array
     except SyntaxError:
@@ -68,7 +62,7 @@ def plot_equations():
         if y2 is not None:
             plt.plot(x, y2, color=settings["color Y2"])
         if y3 is not None:
-            plt.plot(x, y3, color=settings["color Y3"])
+            plt.plot(x, y3, color=settings["color Y3"])     # plots the graphs with the settings
         if y4 is not None:
             plt.plot(x, y4, color=settings["color Y4"])
         if y5 is not None:
@@ -82,7 +76,7 @@ def equations_menu():
     for _ in itertools.count():
         print(f"\n{green}{bold}pick an equation below, or {magenta}[B]{clear}{green}{bold} to go back{clear}")
         for key, value in equations.items():
-            print(f"{green}{bold}{key}{clear}: {value}")
+            print(f"{green}{bold}{key}{clear}: {value}") # prints all the equations and their keys (Y1, Y2 etc.)
         subMenuChoice = input("")
         if subMenuChoice == "B":
             break
@@ -109,13 +103,14 @@ def settings_menu():
             continue
         settingChange = input(f"{blue}{bold}change it to: {clear}")
         settings[subMenuChoice] = settingChange
+        # this menu is the same as the equation one but for settings
 
 replacements = {
     "Sin": "np.sin",
     "Cos": "np.cos",
     "Tan": "np.tan",
     "arcsin": "np.arcsin",
-    "arccos": "np.arccos",
+    "arccos": "np.arccos",      # things that are replaced in the equations so the computer understands them
     "arctan": "np.arctan",
     "^": " ** ",
     "sqrt": "np.sqrt",
@@ -143,7 +138,7 @@ settings = {
 }
 
 equations = {
-    "Y1": "",
+    "Y1": "",   # this is where you will fill in the equations, but on startup, they are of course empty
     "Y2": "",
     "Y3": "",
     "Y4": "",
@@ -156,7 +151,6 @@ precisionMultiplier = settings["precision multiplier"]
 
 warnings.filterwarnings("ignore", message="invalid value encountered in ") # ignores warnings about invalid values (for example, a negative number in sqrt), so that they do not get displayed in the terminal when graphing an equation with invalid x values
 x = np.linspace(calcXmin, calcXmax, ((calcXmax - calcXmin) * precisionMultiplier))    # generates an array of evenly spaced values between calcXmin and calcXmax, and assigns it to x
-
 
 for _ in itertools.count():
     print(f"\n{green}{bold}[A]{clear} input equations | {yellow}{bold}[B]{clear} plot | {red}{bold}[C]{clear} calculate | {blue}{bold}[D]{clear} settings")
