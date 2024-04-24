@@ -29,48 +29,25 @@ def replace_parts_of_equations(equationNumber): # replaces parts of an equation 
     equation = add_multiplication_operator(equation)
     return equation
 
-def plot_equations():
-    y1, y2, y3, y4, y5 = None, None, None, None, None   # sets all of them to None, so ones that can't get evaluated won't be plotted and won't raise an exception
-    try:
-        y1 = eval(replace_parts_of_equations(1))  # evaluates the equations (with the replaced parts) for every value in the array
-    except SyntaxError:
-        pass
-    try:
-        y2 = eval(replace_parts_of_equations(2))
-    except SyntaxError:
-        pass
-    try:
-        y3 = eval(replace_parts_of_equations(3))
-    except SyntaxError:
-        pass
-    try:
-        y4 = eval(replace_parts_of_equations(4))
-    except SyntaxError:
-        pass
-    try:
-        y5 = eval(replace_parts_of_equations(5))
-    except SyntaxError:
-        pass
-
+def plot_equations(x, equations, settings):
     try:
         plt.title(settings["plot title"])
         plt.xlabel(settings["x Label"])
         plt.ylabel(settings["y Label"])
         plt.axis((settings["window X min."], settings["window X max."], settings["window Y min."], settings["window Y max."]))
-        if y1 is not None:
-            plt.plot(x, y1, color=settings["color Y1"])
-        if y2 is not None:
-            plt.plot(x, y2, color=settings["color Y2"])
-        if y3 is not None:
-            plt.plot(x, y3, color=settings["color Y3"])     # plots the graphs with the settings
-        if y4 is not None:
-            plt.plot(x, y4, color=settings["color Y4"])
-        if y5 is not None:
-            plt.plot(x, y5, color=settings["color Y5"])
+
+        for i, equation in enumerate(equations, start=1):
+            try:
+                y = eval(replace_parts_of_equations(i))  # Evaluate the equation
+                if y is not None:
+                    plt.plot(x, y, color=settings[f"color Y{i}"])  # Plot if evaluation succeeds
+            except SyntaxError:
+                pass  # Skip plotting if there's a syntax error in the equation
+
         plt.grid(True)
         plt.show()
-    except:
-        print(f"\n{red}{bold}[plot error]{clear}")
+    except Exception as e:
+        print(f"\n{red}{bold}[plot error]: {e}{clear}")
 
 def equations_menu():
     for _ in itertools.count():
@@ -161,7 +138,7 @@ for _ in itertools.count():
         continue
 
     elif menuChoice == "B":
-        plot_equations()
+        plot_equations(x, equations, settings)
         continue
 
     elif menuChoice == "C":
