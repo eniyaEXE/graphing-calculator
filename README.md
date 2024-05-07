@@ -5,7 +5,7 @@ For now, this is just another command line program (except for the graph window)
 
 to-do list (not in any particular order):
 - add GUI
-- add calc features (dy/dx, minima/maxima, etc.)
+- add more calc features (dy/dx, minima/maxima, etc.)
 - add more operators (|x|, logarithms, factorials etc.)
 - write some official documentation
 - and probably more!
