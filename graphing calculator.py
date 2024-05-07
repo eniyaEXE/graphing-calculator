@@ -29,7 +29,12 @@ def replace_parts_of_equations(equationNumber): # replaces parts of an equation 
     equation = add_multiplication_operator(equation)
     return equation
 
-def plot_equations(x, equations, settings):
+def plot_equations(equations, settings):
+    calcXmax = int(settings["calc. X max."])     # these are made into variables to make it more readable
+    calcXmin = int(settings["calc. X min."])
+    precisionMultiplier = int(settings["precision multiplier"])
+
+    x = np.linspace(calcXmin, calcXmax, ((calcXmax - calcXmin) * precisionMultiplier))    # generates an array of evenly spaced values between calcXmin and calcXmax, and assigns it to x
     try:
         plt.title(settings["plot title"])
         plt.xlabel(settings["x Label"])
@@ -52,35 +57,91 @@ def plot_equations(x, equations, settings):
 def equations_menu():
     for _ in itertools.count():
         print(f"\n{green}{bold}pick an equation below, or {magenta}[B]{clear}{green}{bold} to go back{clear}")
+
         for key, value in equations.items():
             print(f"{green}{bold}{key}{clear}: {value}") # prints all the equations and their keys (Y1, Y2 etc.)
         subMenuChoice = input("")
         if subMenuChoice == "B":
             break
+
         try:
             print(f"\n{green}{bold}{subMenuChoice} is currently:{clear} {equations[subMenuChoice]}")
         except:
             print(f"{red}{bold}[choice error]{clear}")
             continue
+
         equationChange = input(f"{green}{bold}change it to: {clear}")
         equations[subMenuChoice] = equationChange
 
 def settings_menu():
     for _ in itertools.count():
         print(f"\n{blue}{bold}pick a setting below, or {magenta}[B]{clear}{blue}{bold} to go back{clear}")
+
         for key, value in settings.items():
             print(f"{blue}{bold}{key}{clear}: {value}")
         subMenuChoice = input("")
         if subMenuChoice == "B":
             break
+
         try:
             print(f"\n{blue}{bold}{subMenuChoice} is currently:{clear} {settings[subMenuChoice]}")
         except:
             print(f"{red}{bold}[choice error]{clear}")
             continue
+
         settingChange = input(f"{blue}{bold}change it to: {clear}")
         settings[subMenuChoice] = settingChange
         # this menu is the same as the equation one but for settings
+
+def calculations_menu():
+    for _ in itertools.count():
+        print(f"\n{red}{bold}pick a calculation below, or {magenta}[B]{clear}{red}{bold} to go back{clear}")
+
+        for key, value in calculations.items():
+            print(f"{red}{bold}{key}{clear}")
+        subMenuChoice = input("")
+        if subMenuChoice == "B":
+            break
+
+        calculations[subMenuChoice]()
+        # this menu is also the same
+
+def value_calculation():
+    print(f"\n{red}{bold}pick an equation below{clear}")    # pick an equation to find a value
+    for key, value in equations.items():
+        print(f"{red}{bold}{key}{clear}: {value}")          # print all the equations
+
+    equationNumber = input("")                              # type which one
+    value = equations[equationNumber]                       # save the chosen equation for later
+    equationNumber = int(equationNumber.replace("Y", ""))   # remove the Y from the input
+
+    x = float(input(f"\n{red}{bold}x = {clear}"))
+    y = eval(replace_parts_of_equations(equationNumber))    # eval the chosen equation with replaced parts
+
+    print(f"the value for {value} at x = {x} is {y}")       # print results
+
+def zero_calculation():
+    print(f"\n{red}{bold}pick an equation below{clear}")    # same as for the value calculation
+    for key, value in equations.items():
+        print(f"{red}{bold}{key}{clear}: {value}")
+
+    equationNumber = input("")
+    value = equations[equationNumber]
+    equationNumber = int(equationNumber.replace("Y", ""))   # until here
+
+    leftBound = int(input(f"\n{red}{bold}left bound{clear}: ")) # choose a left and right bound for where to calculate y = 0
+    rightBound = int(input(f"{red}{bold}right bound{clear}: "))
+    x = np.linspace(leftBound, rightBound, ((rightBound - leftBound) * settings["calculation precision multiplier"]))   # use the left and right bound to generate an x array
+    y = eval(replace_parts_of_equations(equationNumber))    # eval with replaced parts
+
+    yCloseToZero = np.where(np.abs(y) < 0.1)                # find where |y| < 0.1 (so where y is close to 0)
+
+    if len(yCloseToZero[0] > 0):                            # if a point where |y| < 0.1 is found,
+        correspondingX = x[yCloseToZero]                    # find the corresponding x values to these points
+        meanCorrespondingX = np.mean(correspondingX)        # and calculate the mean of those
+        print(f"\n{red}{bold}y = 0 between {clear}{leftBound} {red}{bold}and {clear}{rightBound}{red}{bold} in {clear}{value}{red}{bold} at x = {clear}{round(meanCorrespondingX, 3)}")
+    else:
+        print(f"\n{red}{bold}no values have been found")
 
 replacements = {
     "Sin": "np.sin",
@@ -111,23 +172,25 @@ settings = {
     "plot title": "plot",
     "calc. X min.": -1000,  # minimum X value from where the graph gets calculated
     "calc. X max.": 1000,   # maximum X value to where the graph gets calculated
-    "precision multiplier": 100  # how many float X values are generated in the array per integer (so a precisionMultiplier of 10 would be 10 floats per integer; 0,1 0,2 0,3 etc. and a precisonMultiplier of 100 would be 0,01 0,02 0,03 etc.)
+    "precision multiplier": 100,  # how many float X values are generated in the array per integer (so a precisionMultiplier of 10 would be 10 floats per integer; 0,1 0,2 0,3 etc. and a precisonMultiplier of 100 would be 0,01 0,02 0,03 etc.)
+    "calculation precision multiplier": 10000 # same as precision multiplier, but for calculations. this is normally set higher because it won't impact performance as much and precision is more important
+}
+
+calculations = {
+    "value": value_calculation,
+    "zero": zero_calculation,
+
 }
 
 equations = {
-    "Y1": "",   # this is where you will fill in the equations, but on startup, they are of course empty
+    "Y1": "",   # this is where you will fill in the equations, but on startup, they are empty
     "Y2": "",
     "Y3": "",
     "Y4": "",
     "Y5": ""
 }
 
-calcXmax = settings["calc. X max."]     # these are made into variables to make it more readable
-calcXmin = settings["calc. X min."]
-precisionMultiplier = settings["precision multiplier"]
-
 warnings.filterwarnings("ignore", message="invalid value encountered in ") # ignores warnings about invalid values (for example, a negative number in sqrt), so that they do not get displayed in the terminal when graphing an equation with invalid x values
-x = np.linspace(calcXmin, calcXmax, ((calcXmax - calcXmin) * precisionMultiplier))    # generates an array of evenly spaced values between calcXmin and calcXmax, and assigns it to x
 
 for _ in itertools.count():
     print(f"\n{green}{bold}[A]{clear} input equations | {yellow}{bold}[B]{clear} plot | {red}{bold}[C]{clear} calculate | {blue}{bold}[D]{clear} settings")
@@ -138,11 +201,11 @@ for _ in itertools.count():
         continue
 
     elif menuChoice == "B":
-        plot_equations(x, equations, settings)
+        plot_equations(equations, settings)
         continue
 
     elif menuChoice == "C":
-        input(f"{magenta}{bold}coming soon! :){clear}\n")
+        calculations_menu()
         continue
 
     elif menuChoice == "D":
