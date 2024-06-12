@@ -14,6 +14,7 @@ This project uses **numpy** and **matplotlib**, so a seperate, highly customizab
 
 to-do list (not in any particular order):
 - add GUI (in a seperate version)
+- add a version with a command based interface
 - add more calc features (dy/dx, minima/maxima, etc.)
 - add more operators (|x|, logarithms, factorials etc.)
 - write some official documentation
